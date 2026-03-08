@@ -1,16 +1,43 @@
-# React + Vite
+# Ne Dendy? - Anket Analiz Paneli
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Anket katilimcilarindan toplanan yanitlarin analiz edilerek anlamli icgorulere donusturuldugu, yoneticilerin bir bakista durumu kavrayabildigi bir dashboard uygulamasi.
 
-Currently, two official plugins are available:
+## Calistirma
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```bash
+git clone <repo-url>
+cd react-task
+npm install
+npm run dev
+```
 
-## React Compiler
+Uygulama varsayilan olarak `http://localhost:5173` adresinde ayaga kalkar.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Teknik Tercihler
 
-## Expanding the ESLint configuration
+### Teknoloji
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **React 19 + Vite** - Hizli gelistirme deneyimi ve modern React ozellikleri icin tercih edildi.
+- **Redux Toolkit** - State yonetimi icin kullanildi. `createSelector` ile memoize edilmis selectorler sayesinde gereksiz yeniden hesaplama onlendi. Chart ve istatistik selectorleri tum veriden, tablo ise filtrelenmis veriden beslenir; boylece yonetici her zaman buyuk resmi gorur.
+- **shadcn/ui (Base UI)** - Tutarli ve ozellestirilmis bir UI icin kullanildi. Tum butonlar, tablolar, selectler, popoverlar shadcn componentleri uzerinden render edilir.
+- **Tailwind CSS v4** - CSS degiskenleri ile tema yonetimi. Light/dark mode destegi `oklch` renk uzayinda tanimli CSS custom properties ile saglanir.
+- **Recharts** - Duygu dagilimi (donut chart) ve skor dagilimi (histogram) icin kullanildi. Tema dagilimi ise daha hafif bir cozum olarak custom CSS progress bar'lar ile gosterilir.
+- **PapaParse** - CSV dosyasinin client-side parse edilmesi icin. Bos degerler `null` olarak korunur, gercek sifir degerleri kaybedilmez.
+
+### Mimari Kararlar
+
+- **Tek kaynak sabitleri**: Tum renk kodlari, label map'leri, esik degerleri ve sayfa boyutu `constants/index.js` dosyasinda merkezlestirildi. Kodda magic number veya hardcoded string bulunmaz.
+- **Null-aware ortalamalar**: Bos degerler (`""`, `null`, `—`) ortalama hesaplamalarindan dislanir, gercek `0` degerleri korunur. Bu sayede istatistikler yaniltici olmaz.
+- **Excel benzeri kolon filtreleri**: Genel amacli, props-driven `ColumnFilter` componenti; herhangi bir kolona uygulanabilir. `Set` optimizasyonu ile buyuk veri setlerinde performansli calisir.
+- **Cached selector factory**: `selectColumnOptions` her kolon icin bir `createSelector` olusturur ve cache'ler. Tekrar cagirildiginda yeni selector yaratmaz, memory leak'i onler.
+- **Dashboard vs tablo ayirimi**: Chart ve ozet istatistikler tum veriden hesaplanir (genel resim), tablo ise filtrelenmis veriyi gosterir (detay inceleme). Bu yonetici dashboardu icin daha anlamli bir yaklasimdir.
+
+### Ozellikler
+
+- 6 ozet istatistik karti (min/ort/maks dropdown destegi)
+- 5 gorselletirme: Duygu dagilimi, Skor dagilimi, Tema dagilimi, Duygu x Eylem matrisi, Risk analizi
+- `survey_id`, `sentiment`, `action` bazinda Excel-like kolon filtreleri
+- Gorunum filtresi (One Cikanlar / Tum Yanitlar) ve Risk filtresi
+- Tablo icinde arama, sayfalama (akilli sayfa numaralari)
+- Dark mode (localStorage ile kalici, sistem tercihine duyarli)
+- Tamamen Turkce arayuz

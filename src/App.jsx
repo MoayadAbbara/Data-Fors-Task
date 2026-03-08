@@ -1,35 +1,63 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useCSVData } from '@/hooks/useCSVData';
+import { useSelector } from 'react-redux';
+import { SummaryCards } from '@/components/layout/summary-cards';
+import { SurveyFilter } from '@/components/layout/survey-filter';
+import { ChartSection } from '@/components/layout/chart-section';
+import { SurveyTable } from '@/components/layout/survey-table';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 function App() {
-  const [count, setCount] = useState(0)
+  useCSVData();
+  const loading = useSelector((state) => state.survey.loading);
+  const error = useSelector((state) => state.survey.error);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground text-lg">Veriler yükleniyor...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-destructive text-lg">Veriler yüklenemedi: {error}</p>
+      </div>
+    );
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="min-h-screen bg-background p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Ne Dendy?</h1>
+            <p className="text-sm text-muted-foreground">
+              Anket yanıtları analiz paneli
+            </p>
+          </div>
+          <ThemeToggle />
+        </div>
+
+        <SummaryCards />
+
+        <ChartSection />
+
+        <SurveyFilter />
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Yanıt Tablosu</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <SurveyTable />
+          </CardContent>
+        </Card>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </div>
+  );
 }
 
-export default App
+export default App;
