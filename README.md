@@ -5,8 +5,8 @@ Anket katilimcilarindan toplanan yanitlarin analiz edilerek anlamli icgorulere d
 ## Calistirma
 
 ```bash
-git clone <repo-url>
-cd react-task
+git clone https://github.com/MoayadAbbara/Data-Fors-Task.git
+cd Data-Fors-Task
 npm install
 npm run dev
 ```
